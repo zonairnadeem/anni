@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Our First Anniversary ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #fdf6f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: background 0.3s ease;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+h1 {
+  font-size: 2.2em;
+  margin-bottom: 30px;
+}
+
+button {
+  font-size: 1.2em;
+  padding: 12px 28px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+}
+
+#enterBtn {
+  background: #c2185b;
+  color: white;
+}
+
+#buttons {
+  margin-top: 20px;
+  position: relative;
+}
+
+#yesBtn {
+  background: #4CAF50;
+  color: white;
+  margin-right: 40px;
+}
+
+#noBtn {
+  background: #f44336;
+  color: white;
+  position: absolute;
+}
+
+#slideshow {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.heart {
+  position: absolute;
+  bottom: -30px;
+  font-size: 24px;
+  pointer-events: none;
+  animation: floatUp linear forwards;
+  opacity: 0.8;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-120vh) scale(1.4); opacity: 0; }
+}
+
+#replayBtn {
+  position: absolute;
+  bottom: 30px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: 2px solid white;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="song1" src="song1.mp3"></audio>
+<audio id="song2" src="song2.mp3" loop></audio>
+<audio id="song3" src="song3.mp3" loop></audio>
+
+<!-- SCREEN 1 -->
+<div id="screen1" class="screen active">
+  <h1>One year ago, we said “I do.” ❤️</h1>
+  <button id="enterBtn">BEGIN</button>
+</div>
+
+<!-- SCREEN 2 -->
+<div id="screen2" class="screen">
+  <h1>365 days later… would you still choose me? 💍</h1>
+  <div id="buttons">
+    <button id="yesBtn">Always</button>
+    <button id="noBtn">Hmm…</button>
+  </div>
+</div>
+
+<!-- SCREEN 3 -->
+<div id="screen3" class="screen">
+  <div id="slideshow"></div>
+  <button id="replayBtn">Replay 🔁</button>
+</div>
+
+<script>
+const screen1 = document.getElementById("screen1");
+const screen2 = document.getElementById("screen2");
+const screen3 = document.getElementById("screen3");
+
+const enterBtn = document.getElementById("enterBtn");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const replayBtn = document.getElementById("replayBtn");
+
+const song1 = document.getElementById("song1");
+const song2 = document.getElementById("song2");
+const song3 = document.getElementById("song3");
+
+const slideshow = document.getElementById("slideshow");
+
+noBtn.style.left = "120px";
+noBtn.style.top = "0px";
+
+let bgTimeout = null;
+const originalBg = document.body.style.background;
+
+function flashNoBackground() {
+  if (bgTimeout) clearTimeout(bgTimeout);
+  document.body.style.background = "url('no-bg.jfif') no-repeat center center / cover fixed";
+  bgTimeout = setTimeout(() => {
+    document.body.style.background = originalBg || "#fdf6f9";
+  }, 1500);
+}
+
+function show(from, to) {
+  from.classList.remove("active");
+  to.classList.add("active");
+}
+
+enterBtn.onclick = () => {
+  show(screen1, screen2);
+  song2.volume = 0.6;
+  song2.play();
+};
+
+function hop() {
+  song1.currentTime = 0;
+  song1.play();
+  flashNoBackground();
+
+  const maxX = 160;
+  const maxY = 80;
+
+  noBtn.style.left = Math.random() * maxX + "px";
+  noBtn.style.top = Math.random() * maxY + "px";
+}
+
+noBtn.addEventListener("mouseenter", hop);
+noBtn.addEventListener("touchstart", hop);
+
+yesBtn.onclick = () => {
+  show(screen2, screen3);
+  song2.pause();
+  song3.volume = 0.7;
+  song3.play();
+  startSlideshow();
+  startHearts();
+};
+
+replayBtn.onclick = () => {
+  location.reload();
+};
+
+const images = [
+  'img1.jpeg','img2.jpeg','img3.jpeg','img4.jpeg','img5.jpeg','img6.jpeg',
+  'img7.jpeg','img8.jpeg','img9.jpeg','img10.jpeg','img11.jpeg','img12.jpeg'
+];
+
+let index = 0;
+
+function startSlideshow() {
+  slideshow.style.backgroundImage = `url(${images[index]})`;
+
+  setInterval(() => {
+    slideshow.style.opacity = 0;
+    setTimeout(() => {
+      index = (index + 1) % images.length;
+      slideshow.style.backgroundImage = `url(${images[index]})`;
+      slideshow.style.opacity = 1;
+    }, 800);
+  }, 3000);
+}
+
+function startHearts() {
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.textContent = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = 18 + Math.random() * 22 + "px";
+    heart.style.animationDuration = 6 + Math.random() * 4 + "s";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 10000);
+  }, 400);
+}
+</script>
+
+</body>
+</html>
